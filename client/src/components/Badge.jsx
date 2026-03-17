@@ -1,7 +1,7 @@
 
 import React from 'react'
 
-const Badge = ({variant='default'}) => {
+const Badge = ({variant='default',children }) => {
    const variants={
     default:'bg-bg-primary text-text-secondary border-border-main',
     active:'bg-bg-inverse text-text-inverse border-border-strong',
@@ -9,7 +9,7 @@ const Badge = ({variant='default'}) => {
         
     }
   return (
-    <div className={`border-2  rounded-pill px-3 py-1.5 w-fit ${variants[variant]}`} >Badge</div>
+    <div className={`border-2  rounded-pill px-3 py-1.5 w-fit text-micro ${variants[variant]}`} >{children}</div>
   )
 }
 
