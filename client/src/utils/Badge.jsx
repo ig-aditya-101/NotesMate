@@ -3,7 +3,7 @@ import React from 'react'
 
 const Badge = ({variant='default',children }) => {
    const variants={
-    default:'bg-bg-primary text-text-secondary border-border-main',
+    default:'bg-bg-secondary text-text-secondary border-border-main',
     active:'bg-bg-inverse text-text-inverse border-border-strong',
     teacher:'bg-accent-green-bg text-accent-green border-accent-green',
         

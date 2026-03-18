@@ -1,6 +1,6 @@
 import React from "react";
 import { Download } from "lucide-react";
-import Badge from "./Badge";
+import Badge from "../utils/Badge";
 
 const NotesCard = ({title,subject,name,downloads,onDownload}) => {
   return (
