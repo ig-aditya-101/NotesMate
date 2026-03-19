@@ -2,9 +2,9 @@ import React from "react";
 import { Download } from "lucide-react";
 import Badge from "../utils/Badge";
 
-const NotesCard = ({title,subject,name,downloads,onDownload}) => {
+const NotesCard = ({title,subject,uploader,downloads,onDownload}) => {
   return (
-    <div className="w-90 p-3 bg-bg-secondary rounded-xl">
+    <div className="w-full px-3 py-2 bg-bg-secondary rounded-xl">
       <div className="headerAndIcon flex justify-between">
         <div className="header text-h3">{title}</div>
         <button className="icon cursor-pointer " onClick={onDownload}>
@@ -17,7 +17,7 @@ const NotesCard = ({title,subject,name,downloads,onDownload}) => {
             <Badge variant="default">{subject}</Badge>
           </div>
           <div className="">
-            <h3 className="text-text-muted text-small">{name}</h3>
+            <h3 className="text-text-muted text-small">{uploader}</h3>
           </div>
         </div>
         <div className="downloadsCount ">

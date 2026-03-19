@@ -22,7 +22,7 @@ const Navbar = () => {
 
     ]
   return (
-    <div className='flex w-95 justify-between fixed bottom-0 left-0 right-0 bg-white border-border-main'>
+    <div className='flex w-full justify-between fixed bottom-0 left-0 right-0 bg-white border-border-main px-4 py-2'>
        { navbarItems.map((item)=> (<div className='text-text-muted text-micro flex flex-col items-center'>{item.icon}{item.label}</div>))      }
     </div>
   )
