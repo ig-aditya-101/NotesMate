@@ -9,11 +9,18 @@ const BrowsePage = () => {
   return (
     <div className=" flex flex-col py-2.5 gap-4 px-4 pt-4  overflow-hidden">
         
-      <div className="header h-10 w-full flex items-center  justify-between">
-        <div className=" text-text-primary text-h1">NotesMate</div>
+      <div className="header h-15  w-full flex items-center  justify-between px-2">
+       <div>
+          <span style={{ fontWeight: 800 }} className="text-display">
+            NOTES
+          </span>
+          <span style={{ fontWeight: 400 }} className="text-display">
+            MATE
+          </span>
+        </div>
         <div className="flex items-center gap-1.5 ">
-          <Button variant="secondary">Login</Button>
-          <Button variant="primary">Sign Up</Button>
+          <Button variant="secondary" size={"md"} >Login</Button>
+          <Button variant="primary" size={"md"}>Sign Up</Button>
         </div>
       </div>
       <div className="searchBar">
