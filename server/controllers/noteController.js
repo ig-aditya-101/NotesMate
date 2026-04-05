@@ -142,3 +142,12 @@ export const rateNotes = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getMyNotes = async (req, res) => {
+  try {
+    const notes =await Note.find({ uploadedBy: req.user._id });
+    res.status(200).json(notes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

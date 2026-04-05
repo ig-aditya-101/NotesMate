@@ -3,6 +3,7 @@ import { uploadMiddleware } from "../middleware/upload.js";
 import {
   deleteNotes,
   downloadNotes,
+  getMyNotes,
   getNotes,
   rateNotes,
   trendingNotes,
@@ -20,8 +21,10 @@ router
   )
   .get("/", tokenVerification, getNotes)
   .get("/trending", tokenVerification, trendingNotes)
+  .get("/my", tokenVerification, getMyNotes)
+
   .get("/:id/download", tokenVerification, downloadNotes)
   .delete("/:id", tokenVerification, deleteNotes)
-  .post("/:id/rate",tokenVerification, rateNotes);
+  .post("/:id/rate", tokenVerification, rateNotes);
 
 export default router;
