@@ -3,10 +3,8 @@ import { aiQualityCheck } from "../utils/aiQualityCheck.js";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { extractText } from "../utils/parser.js";
 import { plagiarismCheck } from "../utils/plagiarismCheck.js";
-import Download from "../models/download.js"
-
-
-
+import Download from "../models/download.js";
+import Rating from "../models/Rating.js";
 
 export const uploadNotes = async (req, res) => {
   try {
@@ -101,22 +99,46 @@ export const downloadNotes = async (req, res) => {
   }
 };
 
-export const deleteNotes= async(req,res)=>{
+export const deleteNotes = async (req, res) => {
   try {
-    const note =await Note.findById(req.params.id);
-    if(!note) return res.status(404).json({message: "Note not found"});
+    const note = await Note.findById(req.params.id);
+    if (!note) return res.status(404).json({ message: "Note not found" });
     if (note.uploadedBy.toString() === req.user._id.toString()) {
-      await deleteOnCloudinary(note.filePublicId)
-      await Note.findByIdAndDelete(req.params.id)
-      return res
-        .status(200)
-        .json({ message: " notes Deleted " });
+      await deleteOnCloudinary(note.filePublicId);
+      await Note.findByIdAndDelete(req.params.id);
+      return res.status(200).json({ message: " notes Deleted " });
     }
-    res.status(403).json({message:'can\'t delete '})
-
-    
+    res.status(403).json({ message: "can't delete " });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-  
-}
+};
+export const rateNotes = async (req, res) => {
+  try {
+    const rating = req.body.rating;
+    const note = await Note.findById(req.params.id);
+    if (note.uploadedBy.toString() === req.user._id.toString()) {
+      return res.status(400).json({ message: "Cannot rate your own notes" });
+    }
+    await Rating.findOneAndUpdate(
+      {
+        note: req.params.id,
+        user: req.user._id,
+      },
+      { rating },
+      { upsert: true, new: true },
+    );
+
+    const allRatings = await Rating.find({ note: req.params.id });
+    const avg =
+      allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length;
+    await Note.findByIdAndUpdate(req.params.id, {
+      averageRating: avg,
+      ratingCount: allRatings.length,
+    });
+    res.status(200).json({ message: "Ratings Saved" });
+    //if rating change rating else log rating
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
