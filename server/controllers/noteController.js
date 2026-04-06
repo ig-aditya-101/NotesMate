@@ -3,7 +3,7 @@ import { aiQualityCheck } from "../utils/aiQualityCheck.js";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { extractText } from "../utils/parser.js";
 import { plagiarismCheck } from "../utils/plagiarismCheck.js";
-import Download from "../models/Download.js";
+import Download from "../models/download.js";
 import Rating from "../models/Rating.js";
 
 export const uploadNotes = async (req, res) => {
