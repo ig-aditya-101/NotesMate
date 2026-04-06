@@ -1,4 +1,6 @@
-import College from "../models/college.js";
+import College from "../models/College.js";
+
+
 
 export const searchColleges= async(req,res)=>{
     try{
