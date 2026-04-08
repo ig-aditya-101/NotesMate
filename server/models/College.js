@@ -10,6 +10,6 @@ const collegeSchema = new Schema(
   },
   { timestamps: true },
 );
-collegeSchema.index({ name: "text" })
+collegeSchema.index({ name: 1 })
 const College = mongoose.model("college", collegeSchema);
 export default College;
