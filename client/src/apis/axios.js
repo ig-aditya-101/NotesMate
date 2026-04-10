@@ -7,4 +7,26 @@ const axiosInstance = axios.create({
     },
 });
 
+axiosInstance.interceptors.request.use(
+    (req) => {
+        const token = localStorage.getItem('NOTESMATE_TOKEN') || null;
+        if (token) {
+            req.headers.Authorization = `Bearer ${token}`
+        }
+        return req;
+    }
+)
+
+axiosInstance.interceptors.response.use(
+    (res) => {
+        return res;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('NOTESMATE_TOKEN')
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+)
 export default axiosInstance;
