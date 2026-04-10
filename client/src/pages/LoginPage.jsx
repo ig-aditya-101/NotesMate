@@ -3,15 +3,33 @@ import { useState } from "react";
 import Button from "../utils/Button";
 import Input from "../utils/Input";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../apis/axios";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
+
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setToken, setUser } = useContext(AuthContext)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (!email || !password) return;
-    navigate("/dashboard");
+  const handleLogin = async () => {
+    try {
+      const res = await axiosInstance.post("/auth/login", {
+        email,
+        password,
+      });
+      setToken(res.data.token);
+      setUser(res.data.user);
+      localStorage.setItem('NOTESMATE_TOKEN', res.data.token)
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      return { message: error.message }
+    }
   };
   return (
     <div className="login w-full h-screen bg-bg-secondary px-6 flex flex-col gap-6 py-8 ">
@@ -68,8 +86,9 @@ const LoginPage = () => {
       </div>
 
       <div className="flex flex-col gap-4 ">
-        <Button size={"lg"}
-        onClick={handleLogin}>Sign In</Button>
+        <Button size={"lg"} onClick={handleLogin}>
+          Sign In
+        </Button>
 
         <div className="mx-auto">or</div>
         <Button variant="secondary" size={"lg"}>
