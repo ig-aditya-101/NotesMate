@@ -1,12 +1,15 @@
 import { UploadCloud } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import Input from "../utils/Input";
 import Button from "../utils/Button";
 import axiosInstance from "../apis/axios";
 import { useNavigate } from "react-router-dom";
 import Modal from "../utils/Modal";
+import { AuthContext } from "../context/AuthContext";
+
 const UploadPage = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const fileInputRef = useRef(null);
   const [title, setTitle] = useState("");
@@ -17,6 +20,7 @@ const UploadPage = () => {
     const uploadBox = new FormData();
     uploadBox.append("title", title);
     uploadBox.append("subject", subject);
+    uploadBox.append("college", user?.college);
     uploadBox.append("file", file);
     try {
       await axiosInstance.post("/notes/upload", uploadBox, {

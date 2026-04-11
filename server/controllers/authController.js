@@ -18,7 +18,7 @@ export const register = async (req, res) => {
       college: college,
     });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.status(201).json({ token });
+    res.status(201).json({ token, user });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -31,20 +31,19 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid Credentials " });
     }
-   
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "invalid credentials" });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.status(200).json({ token });
-
+    res.status(200).json({ token, user });
   } catch (error) {
-    res.status(400).json({message:error.message})
+    res.status(400).json({ message: error.message });
   }
 };
 
-export const getMe =async(req,res)=>{
-  const user=req.user
-  return res.status(200).json({user})
-}
+export const getMe = async (req, res) => {
+  const user = req.user;
+  return res.status(200).json({ user });
+};

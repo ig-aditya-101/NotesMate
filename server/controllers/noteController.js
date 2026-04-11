@@ -64,7 +64,7 @@ export const getNotes = async (req, res) => {
     const skip = (page - 1) * 10;
 
     const notes = await Note.find(filter).skip(skip).limit(10);
-    return res.status(200).json(notes);
+    return res.status(200).json({ notes });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -145,7 +145,7 @@ export const rateNotes = async (req, res) => {
 
 export const getMyNotes = async (req, res) => {
   try {
-    const notes =await Note.find({ uploadedBy: req.user._id });
+    const notes = await Note.find({ uploadedBy: req.user._id });
     res.status(200).json(notes);
   } catch (error) {
     res.status(500).json({ message: error.message });
