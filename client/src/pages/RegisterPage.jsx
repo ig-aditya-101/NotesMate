@@ -3,6 +3,7 @@ import Input from "../utils/Input";
 import Toggle from "../utils/Toggle";
 import Button from "../utils/Button";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../apis/axios";
 
 const RegisterPage = () => {
   const handleRegister = () => {
@@ -14,7 +15,30 @@ const RegisterPage = () => {
   const [confirm, setConfirm] = useState();
   const [college, setCollege] = useState();
   const [isStudent, setIsStudent] = useState();
+  const [collegeList, setCollegeList] = useState([]);
+  const [searchString, setSearchString] = useState();
+
+  useEffect(() => {
+    const delayTimer = setTimeout(() => {
+      if (searchString) {
+        fetchColleges(searchString);
+      } else {
+        setCollegeList([]);
+      }
+    }, 300);
+    return () => clearTimeout(delayTimer);
+  }, [searchString]);
+
   const navigate = useNavigate();
+
+  const fetchColleges = async (searchString) => {
+    try {
+      const res = await axiosInstance.get(`/colleges?search=` + searchString);
+      setCollegeList(res.data);
+    } catch (err) {
+      console.error("Librarian failed to find colleges:", err);
+    }
+  };
   return (
     <div className="w-full py-8 p-7 flex flex-col gap-6">
       <div className="w-full flex flex-col  items-center gap-2">
@@ -42,12 +66,28 @@ const RegisterPage = () => {
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
         />
-        <Toggle value={isStudent} onChange={setIsStudent}/>
+        <Toggle value={isStudent} onChange={setIsStudent} />
         <Input
           placeholder={"Select College"}
-          value={college}
-          onChange={(e) => setCollege - e.target.value}
+          value={searchString}
+          onChange={(e) => setSearchString(e.target.value)}
         />
+        {collegeList.length > 0 && (
+          <div className="flex flex-col bg-bg-secondary w-full border border-gray-600 rounded">
+            {collegeList.map((college) => (
+              <div
+                className="p-3 hover:bg-gray-700 cursor-pointer text-white"
+                onClick={() => {
+                  setCollege(college._id);
+                  setSearchString(college.name);
+                  setCollegeList([]);
+                }}
+              >
+                {college.name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div>
         <Button variant="secondary" size="lg" onClick={handleRegister}>
