@@ -37,6 +37,7 @@ const Dashboard = () => {
               subject={note.subject}
               uploader={note.uploader}
               downloads={note.downloads}
+              onDownload={() => window.open(note.fileUrl, "_blank")}
             />
           </div>
         ))}
