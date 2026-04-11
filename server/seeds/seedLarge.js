@@ -1,7 +1,7 @@
 import fs from "fs";
 import dotenv from "dotenv";
 import connectDB from "../config/db.js";
-import College from "../models/college.js";
+import College from "../models/College.js";
 
 dotenv.config();
 
