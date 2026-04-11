@@ -1,22 +1,41 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Input from "../utils/Input";
 import Toggle from "../utils/Toggle";
 import Button from "../utils/Button";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../apis/axios";
+import { AuthContext } from "../context/AuthContext";
 
 const RegisterPage = () => {
-  const handleRegister = () => {
-    navigate("/dashboard");
+  const handleRegister = async () => {
+    try {
+      if (password !== confirm) {
+        return alert("confirm password doesnt match");
+      }
+      const res = await axiosInstance.post("/auth/register", {
+        name,
+        email,
+        password,
+        college,
+        isStudent,
+      });
+      setToken(res.data.token);
+      setUser(res.data.user);
+      localStorage.setItem("NOTESMATE_TOKEN", res.data.token);
+      navigate("/dashboard");
+    } catch (error) {
+      alert(error);
+    }
   };
   const [name, setName] = useState();
-  const [gmail, setGmail] = useState();
+  const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [confirm, setConfirm] = useState();
   const [college, setCollege] = useState();
   const [isStudent, setIsStudent] = useState();
   const [collegeList, setCollegeList] = useState([]);
   const [searchString, setSearchString] = useState();
+  const { setToken, setUser } = useContext(AuthContext);
 
   useEffect(() => {
     const delayTimer = setTimeout(() => {
@@ -53,8 +72,8 @@ const RegisterPage = () => {
         />
         <Input
           placeholder={"@gmail.com"}
-          value={gmail}
-          onChange={(e) => setGmail(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <Input
           placeholder={"Password"}
