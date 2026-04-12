@@ -15,8 +15,10 @@ const UploadPage = () => {
   const [title, setTitle] = useState("");
   const [subject, setsubject] = useState("");
   const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleUpload = async () => {
+    setIsLoading(true);
     const uploadBox = new FormData();
     uploadBox.append("title", title);
     uploadBox.append("subject", subject);
@@ -28,9 +30,12 @@ const UploadPage = () => {
           "Content-Type": "multipart/form-data",
         },
       });
+
       setShowModal(true);
     } catch (error) {
-      console.error("Upload failed!");
+      alert(error.response?.data?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,20 +46,26 @@ const UploadPage = () => {
         Share your notes with your college
       </div>
 
-      <div
-        onClick={() => fileInputRef.current.click()}
-        className="border-2 border-dashed border-border-main rounded-xl p-10 text-center cursor-pointer flex flex-col items-center gap-2"
-      >
-        <UploadCloud />
-        <p>Tap to select PDF</p>
-        <p className="text-text-muted text-small">{"Max 15MB  ·  PDF only"}</p>
-        <input
-          type="file"
-          ref={fileInputRef}
-          className="hidden"
-          onChange={(e) => setFile(e.target.files[0])}
-        ></input>
-      </div>
+      {file ? (
+        <p>{file.name}</p>
+      ) : (
+        <div
+          onClick={() => fileInputRef.current.click()}
+          className="border-2 border-dashed border-border-main rounded-xl p-10 text-center cursor-pointer flex flex-col items-center gap-2"
+        >
+          <UploadCloud />
+          <p>Tap to select PDF</p>
+          <p className="text-text-muted text-small">
+            {"Max 15MB  ·  PDF only"}
+          </p>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={(e) => setFile(e.target.files[0])}
+          ></input>
+        </div>
+      )}
       <div className="flex flex-col gap-2 ">
         <Input
           placeholder={"Note Title"}
@@ -71,8 +82,13 @@ const UploadPage = () => {
           }}
         />
       </div>
-      <Button variant="primary" size="lg" onClick={handleUpload}>
-        Upload Notes
+      <Button
+        variant={isLoading ? "secondary" : "primary"}
+        size="lg"
+        onClick={handleUpload}
+        disabled={isLoading}
+      >
+        {isLoading ? "Uploading..." : "Upload Notes"}
       </Button>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         {/* Everything inside here is the "children" */}
