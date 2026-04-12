@@ -14,7 +14,7 @@ const App = () => {
   return (
     <>
       <BrowserRouter>
-        <div className="max-w-4xl mx-auto ">
+        <div className="max-w-4xl mx-auto md:ml-56">
           <Routes>
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
