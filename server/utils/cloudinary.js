@@ -9,6 +9,7 @@ export const uploadOnCloudinary = async (buffer, fileName) => {
   const options = {
     resource_type: "raw",
     public_id: fileName,
+    type: "upload",
   };
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(options, (err, res) => {
