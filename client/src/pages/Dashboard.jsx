@@ -31,7 +31,7 @@ const Dashboard = () => {
         </div>
       </div>
       <h1 className="text-h1">My Saved Notes</h1>
-      <div className="notesrow flex flex-col items-center   gap-3">
+      <div className="notesrow grid grid-cols-1 md:grid-cols-2  gap-3">
         {notes.length > 0 ? (
           notes.map((note) => (
             <div className="w-full" key={note._id}>
