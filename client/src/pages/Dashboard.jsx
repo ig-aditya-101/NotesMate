@@ -23,8 +23,12 @@ const Dashboard = () => {
     <div className=" flex flex-col py-2.5 gap-6 px-4 pt-4  overflow-hidden">
       <div className="header flex justify-between items-center">
         <div>
-          <div className="text-display">Hey {user?.name} 👋</div>
-          <div className="text-h3 text-text-secondary p-1">MAIT</div>
+          <div className="text-display">
+            Hey {user?.name?.split(" ")[0]}! 👋
+          </div>
+          <div className="text-h3 text-text-secondary p-1">
+            {user?.college?.name}
+          </div>
         </div>
         <div>
           <Avatar seed="aditya" />

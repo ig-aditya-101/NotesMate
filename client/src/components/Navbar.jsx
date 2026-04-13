@@ -5,7 +5,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const navbarItems = [
     {
-      label: "Home",
+      label: "Dashboard",
       icon: <Home />,
       route: "/dashboard",
     },
