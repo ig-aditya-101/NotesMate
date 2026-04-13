@@ -54,11 +54,11 @@ export const uploadNotes = async (req, res) => {
 export const getNotes = async (req, res) => {
   try {
     const subject = req.query.subject;
-    const college = req.user.college;
+    const college = req.query.college;
 
-    const filter = { college: college };
-    if (subject) {
-      filter.subject = subject;
+    const filter = { subject: subject };
+    if (college) {
+      filter.college = college;
     }
     const page = req.query.page || 1;
     const skip = (page - 1) * 10;

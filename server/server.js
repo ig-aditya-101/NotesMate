@@ -37,21 +37,12 @@ app.use("/api/auth", authRouter);
 app.use("/api/notes", noteRouter);
 app.use("/api/leaderboard", leaderBoardRouter);
 
-import { exec } from "child_process";
-
-app.get('/api/secret-seed', (req, res) => {
-    exec('node seeds/seedLarge.js', (err, stdout, stderr) => {
-        if (err) return res.send("Trigger Error: " + err.message);
-        res.send("Seeding complete! Log: " + stdout);
-    });
-});
-
 const startServer = async () => {
-    await connectDB();
+  await connectDB();
 
-    app.listen(PORT, "0.0.0.0", () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 };
 
 startServer();

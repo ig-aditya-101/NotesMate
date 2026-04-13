@@ -19,8 +19,8 @@ router
     uploadMiddleware.single("file"),
     uploadNotes,
   )
-  .get("/", tokenVerification, getNotes)
-  .get("/trending", tokenVerification, trendingNotes)
+  .get("/", getNotes)
+  .get("/trending", trendingNotes)
   .get("/my", tokenVerification, getMyNotes)
 
   .get("/:id/download", tokenVerification, downloadNotes)
