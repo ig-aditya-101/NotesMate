@@ -6,7 +6,6 @@ import {
   getMyNotes,
   getNotes,
   rateNotes,
-  trendingNotes,
   uploadNotes,
 } from "../controllers/noteController.js";
 import { tokenVerification } from "../middleware/auth.js";
