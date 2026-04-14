@@ -66,24 +66,37 @@ export const getNotes = async (req, res) => {
     const page = req.query.page || 1;
     const skip = (page - 1) * 10;
 
-    const notes = await Note.find(filter).skip(skip).limit(10);
+    const notes = await Note.find(filter)
+      .sort({ downloads: -1 })
+      .skip(skip)
+      .limit(10);
     return res.status(200).json({ notes });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const trendingNotes = async (req, res) => {
-  try {
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const notes = await Note.find({ createdAt: { $gte: sevenDaysAgo } })
-      .sort({ downloads: -1 })
-      .limit(10);
-    return res.status(200).json(notes);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// export const trendingNotes = async (req, res) => {
+//   try {
+//     const subject = req.query.subject;
+//     const college = req.query.college;
+
+//     const filter = {};
+//     if (subject) {
+//       filter.subject;
+//     }
+//     if (college) {
+//       filter.college = college;
+//     }
+//     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+//     const notes = await Note.find({ createdAt: { $gte: sevenDaysAgo } })
+//       .sort({ downloads: -1 })
+//       .limit(10);
+//     return res.status(200).json(notes);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 export const downloadNotes = async (req, res) => {
   try {
