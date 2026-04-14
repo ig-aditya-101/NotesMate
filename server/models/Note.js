@@ -5,8 +5,13 @@ const Schema = mongoose.Schema;
 const noteSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
-    subject: { type: String, required: true, trim: true },
+    subject: { type: mongoose.Schema.Types.ObjectId, ref: "subject" },
+    description: { type: String, required: true, trim: true },
+    university: { type: String, required: true, trim: true },
+    semester: { type: Number, required: true },
     college: { type: mongoose.Schema.Types.ObjectId, ref: "College" },
+    course: { type: String, required: true, trim: true },
+    branch: { type: String, required: true, trim: true },
     uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     fileUrl: { type: String, required: true },
     filePublicId: { type: String, required: true },
@@ -17,12 +22,6 @@ const noteSchema = new Schema(
     ratingCount: { type: Number, default: 0 },
     aiQualityScore: { type: Number },
     contentHash: { type: String },
-    noteStatus: {
-      type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "approved",
-    },
-    isTrending: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
