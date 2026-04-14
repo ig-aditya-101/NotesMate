@@ -56,7 +56,10 @@ export const getNotes = async (req, res) => {
     const subject = req.query.subject;
     const college = req.query.college;
 
-    const filter = { subject: subject };
+    const filter = {};
+    if (subject) {
+      filter.subject;
+    }
     if (college) {
       filter.college = college;
     }
