@@ -1,69 +1,80 @@
 import Note from "../models/Note.js";
-import { aiQualityCheck } from "../utils/aiQualityCheck.js";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
-import { extractText } from "../utils/parser.js";
-import { plagiarismCheck } from "../utils/plagiarismCheck.js";
 import Download from "../models/download.js";
 import Rating from "../models/Rating.js";
+import mongoose from "mongoose";
 
 export const uploadNotes = async (req, res) => {
   try {
-    let aiQualityScore;
-    let contentHash;
-    const { title, subject, college } = req.body;
-    const buffer = req.file.buffer;
-    const text = await extractText(buffer);
-    if (text.length > 100) {
-      const { score, reason, passed } = await aiQualityCheck(text);
+    const {
+      title,
+      subject,
+      college,
+      university,
+      branch,
+      course,
+      semester,
+      description,
+    } = req.body;
 
-      if (!passed) {
-        return res.status(400).json({ message: reason });
-      }
-
-      aiQualityScore = score;
-
-      const { hash, isDuplicate } = await plagiarismCheck(text, college);
-      if (isDuplicate) {
-        return res.status(400).json({ message: "Found Duplicate" });
-      }
-      contentHash = hash;
+    const requiredFields = { title, subject, college, university, branch, course, semester, description };
+    const missingFields = Object.keys(requiredFields).filter((key) => !requiredFields[key]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `The following required fields are missing: ${missingFields.join(", ")}.`,
+      });
     }
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file was attached. Please upload a PDF file to proceed.",
+      });
+    }
+
     const fileName = `notes/${Date.now()}-${req.file.originalname}`;
     const { fileUrl, filePublicId } = await uploadOnCloudinary(
-      buffer,
+      req.file.buffer,
       fileName,
     );
     const note = await Note.create({
-      title: title,
-      subject: subject,
-      college: college,
+      title,
+      subject,
+      college,
+      university,
+      semester,
+      branch,
+      course,
+      description,
       uploadedBy: req.user._id,
       fileSize: req.file.size,
       fileUrl: fileUrl,
       filePublicId: filePublicId,
       fileName: fileName,
-      aiQualityScore: aiQualityScore,
-      contentHash: contentHash,
     });
     res.status(201).json({ note });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[uploadNotes Error]", error);
+    res
+      .status(500)
+      .json({ message: "Failed to upload note. Please try again later." });
   }
 };
 
 export const getNotes = async (req, res) => {
   try {
-    const subject = req.query.subject;
-    const college = req.query.college;
+    const { subject, college, university, branch, semester, course } =
+      req.query;
 
     const filter = {};
-    if (subject) {
-      filter.subject;
-    }
-    if (college) {
-      filter.college = college;
-    }
-    const page = req.query.page || 1;
+    if (mongoose.Types.ObjectId.isValid(subject))
+      filter.subject = new mongoose.Types.ObjectId(subject);
+    if (mongoose.Types.ObjectId.isValid(college))
+      filter.college = new mongoose.Types.ObjectId(college);
+    if (university) filter.university = university;
+    if (branch) filter.branch = branch;
+    if (semester) filter.semester = semester;
+    if (course) filter.course = course;
+
+    const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
 
     const notes = await Note.find(filter)
@@ -72,47 +83,71 @@ export const getNotes = async (req, res) => {
       .limit(10);
     return res.status(200).json({ notes });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[getNotes Error]", error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch notes. Please try again later." });
   }
 };
 
 export const downloadNotes = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
-    if (!note) return res.status(404).json({ message: "Note not found" });
+    if (!note)
+      return res
+        .status(404)
+        .json({ message: `Note with ID '${req.params.id}' was not found.` });
     if (note.uploadedBy.toString() === req.user._id.toString()) {
       return res
-        .status(400)
-        .json({ message: "Cannot download your own notes" });
+        .status(403)
+        .json({ message: "You cannot download your own uploaded notes." });
     }
     await Note.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     await Download.create({ note: req.params.id, user: req.user._id });
     res.status(200).json({ fileUrl: note.fileUrl });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[downloadNotes Error]", error);
+    res
+      .status(500)
+      .json({ message: "Failed to process download. Please try again later." });
   }
 };
 
 export const deleteNotes = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
-    if (!note) return res.status(404).json({ message: "Note not found" });
+    if (!note)
+      return res
+        .status(404)
+        .json({ message: `Note with ID '${req.params.id}' was not found.` });
     if (note.uploadedBy.toString() === req.user._id.toString()) {
       await deleteOnCloudinary(note.filePublicId);
       await Note.findByIdAndDelete(req.params.id);
-      return res.status(200).json({ message: " notes Deleted " });
+      return res.status(200).json({ message: "Note deleted successfully." });
     }
-    res.status(403).json({ message: "can't delete " });
+    res.status(403).json({
+      message:
+        "Access denied. You can only delete notes that you have uploaded.",
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[deleteNotes Error]", error);
+    res
+      .status(500)
+      .json({ message: "Failed to delete note. Please try again later." });
   }
 };
 export const rateNotes = async (req, res) => {
   try {
     const rating = req.body.rating;
     const note = await Note.findById(req.params.id);
+    if (!note)
+      return res
+        .status(404)
+        .json({ message: `Note with ID '${req.params.id}' was not found.` });
     if (note.uploadedBy.toString() === req.user._id.toString()) {
-      return res.status(400).json({ message: "Cannot rate your own notes" });
+      return res
+        .status(403)
+        .json({ message: "You cannot rate your own uploaded notes." });
     }
     await Rating.findOneAndUpdate(
       {
@@ -130,18 +165,23 @@ export const rateNotes = async (req, res) => {
       averageRating: avg,
       ratingCount: allRatings.length,
     });
-    res.status(200).json({ message: "Ratings Saved" });
-    //if rating change rating else log rating
+    res.status(200).json({ message: "Rating submitted successfully." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[rateNotes Error]", error);
+    res
+      .status(500)
+      .json({ message: "Failed to submit rating. Please try again later." });
   }
 };
 
 export const getMyNotes = async (req, res) => {
   try {
     const notes = await Note.find({ uploadedBy: req.user._id });
-    res.status(200).json(notes);
+    res.status(200).json({ notes });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[getMyNotes Error]", error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch your notes. Please try again later." });
   }
 };

@@ -10,7 +10,7 @@ import collegeRouter from "./routes/college.js";
 import authRouter from "./routes/auth.js";
 import noteRouter from "./routes/note.js";
 import leaderBoardRouter from "./routes/leaderBoard.js";
-
+import taxonomyRouter from "./routes/taxonomy.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -36,6 +36,7 @@ app.use("/api/colleges", collegeRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/notes", noteRouter);
 app.use("/api/leaderboard", leaderBoardRouter);
+app.use("/api/taxonomy", taxonomyRouter);
 
 const startServer = async () => {
   await connectDB();
