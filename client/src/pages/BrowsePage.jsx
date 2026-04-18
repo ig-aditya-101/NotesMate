@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../utils/Button";
 import SearchBar from "../components/SearchBar";
-import Badge from "../utils/Badge";
-import { mockNotes } from "../mock/data";
+
 import NotesCard from "../components/NotesCard";
+import axiosInstance from "../apis/axios";
 
 const BrowsePage = () => {
+  const [search, setSearch] = useState("");
+  const [notes, setNotes] = useState([]);
+  const fetchNotes = async (searchWord = "") => {
+    const res = await axiosInstance.get("/notes?searchQuery=" + searchWord);
+    setNotes(res.data.notes);
+  };
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
   return (
     <div className=" flex flex-col py-2.5 gap-4 px-4 pt-4  overflow-hidden">
       <div className="header h-15  w-full flex items-center  justify-between px-2">
@@ -27,23 +37,22 @@ const BrowsePage = () => {
         </div>
       </div>
       <div className="searchBar">
-        <SearchBar placeholder="Search Notes......" />
+        <SearchBar
+          placeholder="Search Notes......"
+          onSearch={(query) => fetchNotes(query)}
+          results={notes}
+        />
       </div>
 
-      {/* Filter Pills will add later */}
-      {/* <div className="flex gap-2">
-        <Badge variant="active">Maths</Badge>
-        <Badge>Maths</Badge>
-        <Badge>Maths</Badge>
-      </div> */}
       <div className="grid grid-cols-1 md:grid-cols-2   gap-3">
-        {mockNotes.map((note) => (
+        {notes.map((note) => (
           <div className="w-full">
             <NotesCard
               title={note.title}
               subject={note.subject}
               uploader={note.uploader}
               downloads={note.downloads}
+              onDownload={() => window.open(note.fileUrl, "_blank")}
             />
           </div>
         ))}
