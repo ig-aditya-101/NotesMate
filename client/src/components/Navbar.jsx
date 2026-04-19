@@ -22,7 +22,7 @@ const Navbar = () => {
     {
       label: "Profile",
       icon: <Circle />,
-      route: "/dashboard",
+      route: "/profile",
     },
   ];
   return (
