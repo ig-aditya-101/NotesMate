@@ -1,26 +1,28 @@
-const FilterBar = ({ value, onChange, options }) => {
+import Select from "../utils/Select";
+
+const FilterBar = ({ filters, lists, onFilterChange }) => {
   return (
-    <div className="flex gap-2 bg-accent-green">
+    <div className=" flex gap-20 ">
+      <Select
+        placeholder={"University"}
+        options={lists.universities}
+        value={filters.university}
+        onChange={(e) => onFilterChange("university", e.target.value)}
+      />
+      <Select
+        placeholder={"Course"}
+        options={lists.courses}
+        value={filters.course}
+        onChange={(e) => onFilterChange("course", e.target.value)}
+      />
 
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">All Subjects</option>
-        
-        {/* Assuming 'options' is a simple array of strings like ['Math', 'Science'] */}
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-
-      <button onClick={() => onChange("")}>
-        Reset
-      </button>
-
+      <Select
+        placeholder={"Branch"}
+        options={lists.branches}
+        value={filters.branch}
+        onChange={(e) => onFilterChange("branch", e.target.value)}
+      />
     </div>
-  )
-}
-export default FilterBar
+  );
+};
+export default FilterBar;
