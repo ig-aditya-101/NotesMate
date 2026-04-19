@@ -17,8 +17,19 @@ export const uploadNotes = async (req, res) => {
       description,
     } = req.body;
 
-    const requiredFields = { title, subject, college, university, branch, course, semester, description };
-    const missingFields = Object.keys(requiredFields).filter((key) => !requiredFields[key]);
+    const requiredFields = {
+      title,
+      subject,
+      college,
+      university,
+      branch,
+      course,
+      semester,
+      description,
+    };
+    const missingFields = Object.keys(requiredFields).filter(
+      (key) => !requiredFields[key],
+    );
     if (missingFields.length > 0) {
       return res.status(400).json({
         message: `The following required fields are missing: ${missingFields.join(", ")}.`,
@@ -61,8 +72,15 @@ export const uploadNotes = async (req, res) => {
 
 export const getNotes = async (req, res) => {
   try {
-    const { subject, college, university, branch, semester, course } =
-      req.query;
+    const {
+      subject,
+      college,
+      university,
+      branch,
+      semester,
+      course,
+      searchQuery,
+    } = req.query;
 
     const filter = {};
     if (mongoose.Types.ObjectId.isValid(subject))
@@ -73,6 +91,9 @@ export const getNotes = async (req, res) => {
     if (branch) filter.branch = branch;
     if (semester) filter.semester = semester;
     if (course) filter.course = course;
+    if (searchQuery) {
+      filter.title = { $regex: searchQuery, $options: "i" };
+    }
 
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * 10;
