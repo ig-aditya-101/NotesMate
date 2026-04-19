@@ -4,17 +4,75 @@ import SearchBar from "../components/SearchBar";
 
 import NotesCard from "../components/NotesCard";
 import axiosInstance from "../apis/axios";
+import { useNavigate } from "react-router-dom";
+import FilterBar from "../components/FilterBar";
 
 const BrowsePage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
+
+  const [filters, setFilters] = useState({
+    university: "",
+    course: "",
+    branch: "",
+  });
+
+  const [lists, setLists] = useState({
+    universities: [],
+    courses: [],
+    branches: [],
+  });
+  const handleFilterChange = (name, value) => {
+    setFilters((prev) => {
+      const newFilters = { ...prev, [name]: value };
+
+      if (name === "university") {
+        newFilters.course = "";
+        newFilters.branch = "";
+      }
+
+      if (name === "course") {
+        newFilters.branch = "";
+      }
+
+      return newFilters;
+    });
+  };
+
   const [notes, setNotes] = useState([]);
   const fetchNotes = async (searchWord = "") => {
     const res = await axiosInstance.get("/notes?searchQuery=" + searchWord);
     setNotes(res.data.notes);
   };
+  const fetchUniversities = async () => {
+    const res = await axiosInstance.get("/taxonomy/universities");
+    setLists((prev) => ({ ...prev, universities: res.data.universities }));
+  };
   useEffect(() => {
     fetchNotes();
+    fetchUniversities();
   }, []);
+
+  useEffect(() => {
+    if (!filters.university) return;
+    const fetchCourses = async () => {
+      const res = await axiosInstance.get(
+        `/taxonomy/courses?university=${filters.university}`,
+      );
+      setLists((prev) => ({ ...prev, courses: res.data.courses }));
+    };
+    fetchCourses();
+  }, [filters.university]);
+  useEffect(() => {
+    if (!filters.course) return;
+    const fetchBranches = async () => {
+      const res = await axiosInstance.get(
+        `/taxonomy/branches?university=${filters.university}&course=${filters.course}`,
+      );
+      setLists((prev) => ({ ...prev, branches: res.data.branches }));
+    };
+    fetchBranches();
+  }, [filters.course]);
 
   return (
     <div className=" flex flex-col py-2.5 gap-4 px-4 pt-4  overflow-hidden">
@@ -28,19 +86,39 @@ const BrowsePage = () => {
           </span>
         </div>
         <div className="flex items-center gap-1.5 ">
-          <Button variant="secondary" size={"md"}>
+          <Button
+            variant="secondary"
+            size={"md"}
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
             Login
           </Button>
-          <Button variant="primary" size={"md"}>
+          <Button
+            variant="primary"
+            size={"md"}
+            onClick={() => {
+              navigate("/register");
+            }}
+          >
             Sign Up
           </Button>
         </div>
       </div>
-      <div className="searchBar">
-        <SearchBar
-          placeholder="Search Notes......"
-          onSearch={(query) => fetchNotes(query)}
-          results={notes}
+      <div className=" border-2 border-accent-green flex flex-col gap-4 p-4 rounded-2xl">
+        <div className="searchBar">
+          <SearchBar
+            placeholder="Search Notes......"
+            onSearch={(query) => fetchNotes(query)}
+            results={notes}
+          />
+          {/* <FilterBar /> */}
+        </div>
+        <FilterBar
+          onFilterChange={handleFilterChange}
+          filters={filters}
+          lists={lists}
         />
       </div>
 
