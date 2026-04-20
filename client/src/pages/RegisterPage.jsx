@@ -116,7 +116,7 @@ const RegisterPage = () => {
             onBlur={formik.handleBlur}
             error={formik.touched.password && formik.errors.password}
           />
-          {/* Password Checklist UI */}
+
           <div className="px-4 flex flex-col gap-1">
             <p
               className={`text-small flex items-center gap-1 ${formik.values.password.length >= 8 ? "text-accent-green" : "text-text-muted"}`}
