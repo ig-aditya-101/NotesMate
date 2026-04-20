@@ -8,9 +8,11 @@ import { useNavigate } from "react-router-dom";
 import FilterBar from "../components/FilterBar";
 import { AuthContext } from "../context/AuthContext";
 import { handleDownload } from "../utils/downloadHandler";
+import { useToast } from "../context/ToastContext";
 
 const BrowsePage = () => {
   const { user } = useContext(AuthContext);
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [notes, setNotes] = useState([]);
 
@@ -168,7 +170,7 @@ const BrowsePage = () => {
               subject={note.subject}
               uploader={note.uploader}
               downloads={note.downloads}
-              onDownload={() => handleDownload(note._id, note.title)}
+              onDownload={() => handleDownload(note._id, note.title, !!user, showToast)}
             />
           </div>
         ))}

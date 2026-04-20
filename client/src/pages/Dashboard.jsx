@@ -5,10 +5,12 @@ import NotesCard from "../components/NotesCard";
 import axiosInstance from "../apis/axios";
 import { AuthContext } from "../context/AuthContext";
 import { handleDownload } from "../utils/downloadHandler";
+import { useToast } from "../context/ToastContext";
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
   const { user } = useContext(AuthContext);
+  const { showToast } = useToast();
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -45,7 +47,7 @@ const Dashboard = () => {
                 subject={note.subject}
                 uploader={note.uploader}
                 downloads={note.downloads}
-                onDownload={() => handleDownload(note._id, note.title)}
+                onDownload={() => handleDownload(note._id, note.title, !!user, showToast)}
               />
             </div>
           ))
