@@ -41,10 +41,13 @@ export const uploadNotes = async (req, res) => {
       });
     }
 
-    const fileName = `notes/${Date.now()}-${req.file.originalname}`;
+    const baseName = req.file.originalname.includes(".") 
+      ? req.file.originalname.split(".").slice(0, -1).join(".") 
+      : req.file.originalname;
+    const publicId = `notes/${Date.now()}-${baseName}`;
     const { fileUrl, filePublicId, resourceType } = await uploadOnCloudinary(
       req.file.buffer,
-      fileName,
+      publicId,
     );
     const note = await Note.create({
       title,
@@ -60,7 +63,7 @@ export const uploadNotes = async (req, res) => {
       fileUrl: fileUrl,
       filePublicId: filePublicId,
       resourceType: resourceType,
-      fileName: fileName,
+      fileName: publicId,
     });
     res.status(201).json({ note });
   } catch (error) {
@@ -127,7 +130,9 @@ export const downloadNotes = async (req, res) => {
     await Note.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     await Download.create({ note: req.params.id, user: req.user._id });
     let fileUrl = note.fileUrl;
-    if (fileUrl.includes("upload/") && !fileUrl.includes("fl_attachment")) {
+    // Only apply fl_attachment to image/video resources (PDFs are treated as images)
+    // and avoid applying it to raw resources which don't support transformations.
+    if (fileUrl.includes("upload/") && !fileUrl.includes("fl_attachment") && !fileUrl.includes("/raw/")) {
       fileUrl = fileUrl.replace("upload/", "upload/fl_attachment/");
     }
     res.status(200).json({ fileUrl });
