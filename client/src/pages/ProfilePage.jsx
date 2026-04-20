@@ -7,7 +7,9 @@ import Button from "../utils/Button";
 const ProfilePage = () => {
   return (
     <div className="flex flex-col justify-center items-center">
-      <h1 className="">Profile</h1>
+      <div className="">
+        <h1 className="">Profile</h1>
+      </div>
       <div>
         <Avatar />
       </div>
