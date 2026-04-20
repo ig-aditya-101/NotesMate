@@ -42,7 +42,7 @@ export const uploadNotes = async (req, res) => {
     }
 
     const fileName = `notes/${Date.now()}-${req.file.originalname}`;
-    const { fileUrl, filePublicId } = await uploadOnCloudinary(
+    const { fileUrl, filePublicId, resourceType } = await uploadOnCloudinary(
       req.file.buffer,
       fileName,
     );
@@ -59,6 +59,7 @@ export const uploadNotes = async (req, res) => {
       fileSize: req.file.size,
       fileUrl: fileUrl,
       filePublicId: filePublicId,
+      resourceType: resourceType,
       fileName: fileName,
     });
     res.status(201).json({ note });
@@ -125,7 +126,11 @@ export const downloadNotes = async (req, res) => {
     }
     await Note.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     await Download.create({ note: req.params.id, user: req.user._id });
-    res.status(200).json({ fileUrl: note.fileUrl });
+    let fileUrl = note.fileUrl;
+    if (fileUrl.includes("upload/") && !fileUrl.includes("fl_attachment")) {
+      fileUrl = fileUrl.replace("upload/", "upload/fl_attachment/");
+    }
+    res.status(200).json({ fileUrl });
   } catch (error) {
     console.error("[downloadNotes Error]", error);
     res
@@ -142,7 +147,7 @@ export const deleteNotes = async (req, res) => {
         .status(404)
         .json({ message: `Note with ID '${req.params.id}' was not found.` });
     if (note.uploadedBy.toString() === req.user._id.toString()) {
-      await deleteOnCloudinary(note.filePublicId);
+      await deleteOnCloudinary(note.filePublicId, note.resourceType);
       await Note.findByIdAndDelete(req.params.id);
       return res.status(200).json({ message: "Note deleted successfully." });
     }

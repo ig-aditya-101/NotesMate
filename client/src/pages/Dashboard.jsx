@@ -4,6 +4,7 @@ import Avatar from "../utils/Avatar";
 import NotesCard from "../components/NotesCard";
 import axiosInstance from "../apis/axios";
 import { AuthContext } from "../context/AuthContext";
+import { handleDownload } from "../utils/downloadHandler";
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
@@ -44,7 +45,7 @@ const Dashboard = () => {
                 subject={note.subject}
                 uploader={note.uploader}
                 downloads={note.downloads}
-                onDownload={() => window.open(note.fileUrl, "_blank")}
+                onDownload={() => handleDownload(note._id, note.title)}
               />
             </div>
           ))

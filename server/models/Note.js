@@ -15,6 +15,7 @@ const noteSchema = new Schema(
     uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     fileUrl: { type: String, required: true },
     filePublicId: { type: String, required: true },
+    resourceType: { type: String, default: "raw" },
     fileName: { type: String },
     fileSize: { type: Number },
     downloads: { type: Number, default: 0 },
