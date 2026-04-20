@@ -45,12 +45,24 @@ export const getSemesters = async (req, res) => {
 
 export const getSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.find({
-      university: req.query.university,
-      course: req.query.course,
-      branch: req.query.branch,
-      semester: req.query.semester,
-    }).select("_id name");
+    const { university, name, course, branch, semester } = req.query;
+    const filter = {};
+    if (university) {
+      filter.university = university;
+    }
+    if (course) {
+      filter.course = course;
+    }
+    if (branch) {
+      filter.branch = branch;
+    }
+    if (semester) {
+      filter.semester = semester;
+    }
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
+    const subjects = await Subject.find(filter).select("_id name");
     res.status(200).json({ subjects });
   } catch (error) {
     res.status(500).json({ message: error.message });
