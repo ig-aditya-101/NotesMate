@@ -40,12 +40,12 @@ const SearchBar = ({ onSearch, placeholder, results = [], onSelect }) => {
               key={result._id}
               className="px-4 py-3 hover:bg-bg-primary cursor-pointer text-text-primary border-b border-border-main last:border-0"
               onClick={() => {
-                setQuery(result.title);
+                setQuery(result.name);
                 setShowDropdown(false);
                 if (onSelect) onSelect(result); // Pass clicked note up
               }}
             >
-              {result.title}
+              {result.name}
             </div>
           ))}
         </div>

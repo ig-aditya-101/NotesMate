@@ -11,7 +11,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await axiosInstance.get("/notes");
+        const res = await axiosInstance.get("/notes/my");
         setNotes(res.data.notes);
       } catch (error) {
         alert(error);

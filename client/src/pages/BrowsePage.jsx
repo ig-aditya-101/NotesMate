@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Button from "../utils/Button";
 import SearchBar from "../components/SearchBar";
 
@@ -6,12 +6,15 @@ import NotesCard from "../components/NotesCard";
 import axiosInstance from "../apis/axios";
 import { useNavigate } from "react-router-dom";
 import FilterBar from "../components/FilterBar";
+import { AuthContext } from "../context/AuthContext";
 
 const BrowsePage = () => {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+  const [notes, setNotes] = useState([]);
 
   const [filters, setFilters] = useState({
+    subject: "",
     university: "",
     course: "",
     branch: "",
@@ -22,6 +25,11 @@ const BrowsePage = () => {
     courses: [],
     branches: [],
   });
+
+  const [subjectsList, setSubjectsList] = useState([]);
+  const handleSubjectSelect = (selectedSubject) => {
+    setFilters((prev) => ({ ...prev, subject: selectedSubject._id }));
+  };
   const handleFilterChange = (name, value) => {
     setFilters((prev) => {
       const newFilters = { ...prev, [name]: value };
@@ -29,27 +37,50 @@ const BrowsePage = () => {
       if (name === "university") {
         newFilters.course = "";
         newFilters.branch = "";
+        newFilters.subject = "";
       }
 
       if (name === "course") {
         newFilters.branch = "";
+        newFilters.subject = "";
+      }
+      if (name === "branch") {
+        newFilters.subject = "";
       }
 
       return newFilters;
     });
   };
 
-  const [notes, setNotes] = useState([]);
-  const fetchNotes = async (searchWord = "") => {
-    const res = await axiosInstance.get("/notes?searchQuery=" + searchWord);
+  const fetchSubjects = async (query) => {
+    try {
+      const res = await axiosInstance.get(
+        `/taxonomy/subject?university=${filters.university}&course=${filters.course}&branch=${filters.branch}&name=${query}`,
+      );
+      setSubjectsList(res.data.subjects);
+    } catch (error) {
+      alert("unable to fetch subjects");
+    }
+  };
+  const fetchNotes = async () => {
+    // 1. Collect all "stamps" from your filters
+    const { university, course, branch, subject } = filters;
+
+    // 2. Build the URL (Send EVERYTHING at once!)
+    const url = `/notes?university=${university}&course=${course}&branch=${branch}&subject=${subject}`;
+
+    const res = await axiosInstance.get(url);
     setNotes(res.data.notes);
   };
+
   const fetchUniversities = async () => {
     const res = await axiosInstance.get("/taxonomy/universities");
     setLists((prev) => ({ ...prev, universities: res.data.universities }));
   };
   useEffect(() => {
     fetchNotes();
+  }, [filters]);
+  useEffect(() => {
     fetchUniversities();
   }, []);
 
@@ -85,33 +116,39 @@ const BrowsePage = () => {
             MATE
           </span>
         </div>
-        <div className="flex items-center gap-1.5 ">
-          <Button
-            variant="secondary"
-            size={"md"}
-            onClick={() => {
-              navigate("/login");
-            }}
-          >
-            Login
-          </Button>
-          <Button
-            variant="primary"
-            size={"md"}
-            onClick={() => {
-              navigate("/register");
-            }}
-          >
-            Sign Up
-          </Button>
-        </div>
+        {user ? (
+          <div></div>
+        ) : (
+          <div className="flex items-center gap-1.5 ">
+            <Button
+              variant="secondary"
+              size={"md"}
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              variant="primary"
+              size={"md"}
+              onClick={() => {
+                navigate("/register");
+              }}
+            >
+              Sign Up
+            </Button>
+          </div>
+        )}
       </div>
       <div className=" border-2 border-accent-green flex flex-col gap-4 p-4 rounded-2xl">
         <div className="searchBar">
           <SearchBar
-            placeholder="Search Notes......"
-            onSearch={(query) => fetchNotes(query)}
-            results={notes}
+            key={filters.university + filters.course + filters.branch}
+            placeholder="Search Subjects......"
+            onSearch={(query) => fetchSubjects(query)}
+            results={subjectsList}
+            onSelect={handleSubjectSelect}
           />
           {/* <FilterBar /> */}
         </div>
